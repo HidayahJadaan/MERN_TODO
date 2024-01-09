@@ -39,7 +39,7 @@ const register = asyncHandler(async (req, res) => {
 
     const userCreated = await newUser.save();
 
-    const token = jwt.sign({ id: userCreated._id, email: userCreated.email }, process.env.JWT_SECRET_KEY);
+    const token = jwt.sign({ id: userCreated._id, isAdmin: userCreated.isAdmin }, process.env.JWT_SECRET_KEY);
     const { password, ...other } = userCreated._doc;
 
     res.status(201).json({ ...other, token });
@@ -62,7 +62,7 @@ const login = asyncHandler(async (req, res) => {
     let user = await User.findOne({ email: req.body.email });
     // CHECKING Credentials From User's Email
     if (!user) {
-        return res.status(400).json({ error: 'User Not Found, Please Sign Up First' });
+        return res.status(400).json({ error: 'INVALID EMAIL OR PASSWORD' });
     }
 
     const isPasswordsMatch = await bcrypt.compare(req.body.password, user.password);
@@ -71,7 +71,7 @@ const login = asyncHandler(async (req, res) => {
         return res.status(400).json({ error: 'INVALID EMAIL OR PASSWORD' });
     }
 
-    const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET_KEY);
+    const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.JWT_SECRET_KEY);
     const { password, ...other } = user._doc;
 
     res.status(201).json({ ...other, token });

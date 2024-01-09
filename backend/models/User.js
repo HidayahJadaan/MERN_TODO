@@ -4,6 +4,11 @@ const passwordComplexity = require('joi-password-complexity');
 
 // USER SCHEMA
 const UserSchema = new mongoose.Schema({
+    username: {
+        type: String,
+        required: true,
+        trim : true,
+    },
     email: {
         type: String,
         required: true,
@@ -12,20 +17,18 @@ const UserSchema = new mongoose.Schema({
         minlength:5,
         maxlength:100
     },
-    username: {
-        type: String,
-        required: true,
-        trim : true,
-    },
     password: {
         type: String,
         required: true,
+    },
+    isAdmin:{
+        type: Boolean,
+        default: true
     },
     list: [{
         type: mongoose.Types.ObjectId,
         ref:'List'
     }]
-   
 }, {timestamps: true}); 
 
 // USER MODEL
