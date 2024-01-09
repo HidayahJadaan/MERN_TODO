@@ -1,0 +1,20 @@
+.list-header{
+width: 100%;
+    display: flex;
+    justify-content: space-between;
+    border-bottom: rgba(0, 0, 0, 0.05);
+}
+
+.list-header .button-container{
+    display: flex;
+    align-items: center;
+}
+
+.button-container button{
+    margin: 0 5px;
+    padding: 5px 10px;
+    border-radius: 12px;
+    background-color: transparent;
+    cursor: pointer;
+    font-size: 15px;
+}
