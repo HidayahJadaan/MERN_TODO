@@ -1,92 +1,18 @@
-# fullstack-todo-app
+# MERN TODO MANAGEMNT APP
 A simple and easy-to-use todo app that helps you stay organized and on top of your daily tasks.
-
-<div align="center">
-  <a href="https://github.com/alokVerma749/Todo-App">
-    <img src="https://learncodeonline.in/mascot.png" alt="Logo" width="80">
-  </a>
-
-<h3 align="center">TODO_APP</h3>
-
-![image](https://github.com/alokVerma749/Todo-App/assets/87599400/7f1dd556-e7f4-4de1-8e99-19d0ce196678)
-
-  <p align="center">
-    <br />
-    <a href="https://www.youtube.com/watch?v=Q7f0l142XxA">Video Presentation Link</a>
-  </p>
-</div>
 
 ## 🛠 Technologies Used
   - Mongodb - database
   - NODE.js - Java Script Runtime Engine
   - React JS - frontend library
   - Express JS - Node js library
-  - Tailwind CSS - CSS 
-  
-  ### 🛠 For Authentication
-  - JWT tokens has been used 
-  
-  ## Video Demo
-  Check out the video demo here: [https://lnkd.in/diwcR_8y]( https://lnkd.in/diwcR_8y)
-  
-  ## Source Code
-  The source code is available on Github: [https://lnkd.in/dVQAwr7g](https://lnkd.in/dVQAwr7g)
+  - No Redux Or Context API Or Any Advanced State Management Ways
+ ## 
+ ![Register](https://github.com/HidayahJadaan/MERN_TODO/assets/121747756/439277c9-70c8-4440-a8ec-4319e4a814fc)
+![Login](https://github.com/HidayahJadaan/MERN_TODO/assets/121747756/7e411358-aa10-4e01-9528-562216a88f5a)
+![Todos](https://github.com/HidayahJadaan/MERN_TODO/assets/121747756/a46a180f-6759-4bb0-b3c9-b7aa20184724)
+![Tasks](https://github.com/HidayahJadaan/MERN_TODO/assets/121747756/95fe24b9-4ff8-4b3d-92b0-eebec26a52a9)
 
-## 🚩 Run Locally
-
-Clone the project
-
-```git
-  git clone https://github.com/alokVerma749/Todo-App.git
-```
-
-Go to the project directory
-
-```bash
-  cd Todo-App/
-```
-
-Run Frontend 
-
-- move to frontend folder
-
-```npm
-  cd client
-```
-
-- Install Packages
-
-```npm
-  npm install
-```
-
-- Start frontend server
-
-```npm
-  npm start
-```
-
-Run Backend (in other terminal)
-
-- move to backend folder
-
-```npm
-  cd server
-```
-
-- Install Packages
-
-```npm
-  npm install
-```
-
-- Start backend server
-
-```npm
-  npm run dev
-```
-
-💀 please make sure to put your mongodb connection URI in .env file
 
 ## 📝 Features
 
@@ -95,18 +21,3 @@ Run Backend (in other terminal)
 - Create Todo and instatly renders on the screen
 - Todos are get saved in database
 - All CRUD operations can be done.
-
-## 🤔 What i have learnt By working on this project
-1. How to use hooks in react  
-2. How to authorize certain route
-2. How to connect frontend and backend
-3. Learn how to use POSTMAN
-4. Learn CRUD in database
-5. Learn how to handle APIs
-
-## 😌 Honest Time to finish the project
-
-It took around 3 days to complete this project
-
-## 👀 Feedback
-If you have any feedback, please reach out to me at alokverma749@gmail.com
