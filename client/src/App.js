@@ -1,10 +1,8 @@
 import './App.css';
-import Navbar from './components/Navbar';
-import Landing from './pages/Landing';
-import Signup from './pages/Signup';
-import Login from './pages/Login';
+import Landing from "./pages/Todos/Landing"
+import Signup from './pages/Forms/Signup';
+import Login from './pages/Forms/Login';
 import { Routes, Route } from 'react-router-dom'
-
 
 function App() {
   return (
@@ -12,10 +10,7 @@ function App() {
       <Routes>
         <Route path='/' element={<Signup />} />
         <Route path='/login' element={<Login />} />
-        <Route path='/todos' element={<>
-          <Navbar />
-          <Landing />
-        </>} />
+        <Route path='/todos' element={ <Landing /> } />
       </Routes>
     </>
   )

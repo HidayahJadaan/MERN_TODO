@@ -4,16 +4,16 @@ export const signup = async (req, res) => {
     try {
         const { name, email, password } = req.body
         if (!name || !email || !password) {
-            return res.status(404).json({
+            return res.status(200).json({
                 success: false,
-                message: 'all fields are required'
+                message: 'All Fields Are Required'
             })
         }
         const isUser = await User.findOne({ email })
         if (isUser) {
-            return res.status(400).json({
+            return res.status(200).json({
                 success: false,
-                message: 'user Already present'
+                message: 'User Already Registerd'
             })
         }
         const user = new User({
@@ -25,12 +25,12 @@ export const signup = async (req, res) => {
         if (!response) {
             return res.status(200).json({
                 success: false,
-                message: 'user registeration failed'
+                message: 'User Registeration Failed'
             })
         }
         res.status(200).json({
             success: true,
-            message: 'user registered successfully',
+            message: 'User Registered Successfully',
             response
         })
     } catch (error) {
@@ -44,21 +44,21 @@ export const login = async (req, res) => {
     try {
         const { email, password } = req.body
         if (!email || !password) {
-            return res.status(500).json({
+            return res.status(200).json({
                 success: false,
-                message: 'all fields are required'
+                message: 'All Fields Are Required'
             })
         }
         const user = await User.findOne({ email })
         if (!user) {
-            return res.status(400).json({
+            return res.status(200).json({
                 success: false,
-                message: 'user not exists'
+                message: 'User Not Exists, Please Sign Up'
             })
         }
         const isPasswordCorrect = await user.comparePassword(password)
         if (!isPasswordCorrect) {
-            return res.status(400).json({
+            return res.status(200).json({
                 success: false,
                 message: 'Invalid Credentials'
             })
@@ -66,7 +66,7 @@ export const login = async (req, res) => {
         const token = await user.generateToken()
         res.status(200).json({
             success: true,
-            message: 'user logged in successfully',
+            message: 'User Logged In Successfully',
             token
         })
     } catch (error) {

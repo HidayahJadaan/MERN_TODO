@@ -4,9 +4,9 @@ export const createTodo = async (req, res) => {
         const { title, createdAt } = req.body
         const user_id = req.user.userid._id
         if (!title) {
-            return res.status(500).json({
+            return res.status(200).json({
                 success: false,
-                message: 'todo is empty'
+                message: 'Todo Should Not Be Empty'
             })
         }
         const todo = new Todo({
@@ -18,12 +18,12 @@ export const createTodo = async (req, res) => {
         if (response) {
             res.status(200).json({
                 success: true,
-                message: 'todo created successfully'
+                message: 'Todo Created Successfully'
             })
         } else {
             res.status(200).json({
                 success: false,
-                message: 'cannot save todo in DB'
+                message: 'Cannot Save Todo In DB, Somthing Went Wrong'
             })
         }
     } catch (error) {
@@ -37,21 +37,21 @@ export const deleteTodo = async (req, res) => {
     try {
         const { todoid } = req.params
         if (!todoid) {
-            res.status(500).json({
+            res.status(200).json({
                 success: false,
-                message: "can't find todoid"
+                message: "Invalid Todo ID"
             })
         }
         const deletedTodo = await Todo.findByIdAndDelete(todoid)
         if (!deletedTodo) {
-            res.status(500).json({
+            res.status(200).json({
                 success: false,
-                message: 'todo deletion failed'
+                message: 'Todo Deletion Failed, Somthing Went Wrong'
             })
         } else {
             res.status(200).json({
                 success: true,
-                message: 'todo deleted successfully',
+                message: 'Todo Deleted Successfully',
                 deletedTodo
             })
         }
@@ -64,9 +64,9 @@ export const editTodo = async (req, res) => {
         const { todoid } = req.params
         const { title } = req.body
         if (!todoid) {
-            res.status(500).json({
+            res.status(200).json({
                 success: false,
-                message: "can't find todoid"
+                message: "Invalid Todo ID"
             })
         }
         // TODO: check if todo is present in DB
@@ -74,14 +74,14 @@ export const editTodo = async (req, res) => {
             title: title
         })
         if (!todo) {
-            res.status(500).json({
+            res.status(200).json({
                 success: false,
-                message: 'todo updation failed'
+                message: 'Todo Updation Failed'
             })
         }
         res.status(200).json({
             success: true,
-            message: 'todo updated successfully'
+            message: 'Todo Updated Successfully'
         })
     } catch (error) {
         throw new Error(error.message)
@@ -93,14 +93,14 @@ export const getTodos = async (req, res) => {
         const username = req.user.name
         const todos = await Todo.find({ user_id })
         if (!todos) {
-            res.status(500).json({
+            res.status(200).json({
                 success: false,
-                message: 'todos fetching failed'
+                message: 'Todos Fetching Failed'
             })
         }
         res.status(200).json({
             success: true,
-            message: 'todos fetching successfully',
+            message: 'Todos fetching Successfully',
             todos,
             username
         })
@@ -116,19 +116,19 @@ export const getTodo = async (req, res) => {
         if (!todoid) {
             res.status(200).json({
                 success: false,
-                message: "can't find todoid"
+                message: "Can't Find Todoid, Invalid ID"
             })
         }
         const todo = await Todo.findById(todoid)
         if (!todo) {
             res.status(200).json({
                 success: false,
-                message: 'todo fetching failed'
+                message: 'Todo Fetching Failed'
             })
         } else {
             res.status(200).json({
                 success: true,
-                message: 'todo fetching successfully',
+                message: 'Todo Fetching Successfully',
                 todo
             })
         }
@@ -141,9 +141,9 @@ export const createTask = async (req, res) => {
         const { todoid } = req.params
         const { task } = req.body
         if (!todoid) {
-            res.status(500).json({
+            res.status(200).json({
                 success: false,
-                message: "can't find todoid"
+                message: "Can't Find Todo ID For This Task"
             })
         }
         const todo = await Todo.findById(todoid)
@@ -151,7 +151,7 @@ export const createTask = async (req, res) => {
         await todo.save()
         res.status(200).json({
             success: true,
-            message: "task added successfully",
+            message: "Task Added Successfully",
             task
         })
     } catch (error) {
@@ -167,16 +167,16 @@ export const deleteTask = async (req, res) => {
         // Find and update the todo tasks
         const todo = await Todo.findById(todoid);
         if (!todo) {
-            return res.status(404).json({
+            return res.status(200).json({
                 success: false,
-                message: "Todo not found",
+                message: "Todo Not Found, Invalid ID",
             });
         }
 
         if (taskIndex >= todo.tasks.length || taskIndex < 0) {
             return res.status(400).json({
                 success: false,
-                message: "Task index out of bounds",
+                message: "Task Index Out of Bounds",
             });
         }
 
@@ -186,12 +186,12 @@ export const deleteTask = async (req, res) => {
 
         return res.status(200).json({
             success: true,
-            message: "Task deleted successfully",
+            message: "Task Deleted Successfully",
         });
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: error.message || "Internal server error",
+            message: error.message || "Internal Server ERROR",
         });
     }
 };
@@ -203,13 +203,13 @@ export const getTasks = async (req, res) => {
         if (!todoid) {
             res.status(500).json({
                 success: false,
-                message: "can't find todoid"
+                message: "Can't Find TodoID For This Task, INVALID ID"
             })
         }
         const todo = await Todo.findById(todoid)
         res.status(200).json({
             success: true,
-            message: "task fethched successfully",
+            message: "Task Fethched Successfully",
             tasks: todo.tasks,
             title: todo.title
         })
@@ -226,13 +226,13 @@ export const editTask = async (req, res) =>{
         if (!todoid) {
             return res.status(400).json({
                 success: false,
-                message: "Can't find todoid",
+                message: "Can't Find TodoID For This Task, INVALID ID",
             });
         }
         if (!oldTaskString || !newTaskString) {
             return res.status(400).json({
                 success: false,
-                message: "Missing task strings",
+                message: "Missing Task Strings, Should Not Be Empty",
             });
         }
 
@@ -240,7 +240,7 @@ export const editTask = async (req, res) =>{
         if (!todo) {
             return res.status(404).json({
                 success: false,
-                message: "Todo not found",
+                message: "Can't Find TodoID For This Task, INVALID ID",
             });
         }
 
@@ -248,7 +248,7 @@ export const editTask = async (req, res) =>{
         if (taskIndex === -1) {
             return res.status(404).json({
                 success: false,
-                message: "Task not found in the todo",
+                message: "Task Not Found In The Todo",
             });
         }
 
@@ -257,12 +257,12 @@ export const editTask = async (req, res) =>{
 
         return res.status(200).json({
             success: true,
-            message: "Task edited successfully",
+            message: "Task Edited Successfully",
         });
     } catch (error) {
         return res.status(500).json({
             success: false,
-            message: error.message || "Internal server error",
+            message: error.message || "Internal Server Error",
         });
     }
 }
@@ -276,7 +276,7 @@ export const sortTodo = async (req, res) => {
         const todos = await Todo.find({ user_id }).sort({ 'createdAt': order })
         res.status(200).json({
             success: true,
-            message: "todos sorted successfully",
+            message: "Todos Sorted Successfully",
             todos
         })
     } catch (error) {
