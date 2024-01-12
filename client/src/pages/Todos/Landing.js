@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 import "react-toastify/dist/ReactToastify.css";
@@ -559,7 +559,20 @@ const updateTodoCompletion = async (todoId, completed) => {
   
 
   return (
-    <div className={`TodoWrapper ${isFakeDark ? "fake-dark-mode" : ""}`}>
+   <>
+   <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme="light"
+          />
+   <div className={`TodoWrapper ${isFakeDark ? "fake-dark-mode" : ""}`}>
       <button
         onClick={() => setIsFakeDark((isFakeDark) => !isFakeDark)}
         className="btn-fake-dark-mode"
@@ -679,6 +692,7 @@ const updateTodoCompletion = async (todoId, completed) => {
         </div>
       )}
     </div>
+   </>
   );
 };
 

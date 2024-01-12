@@ -196,12 +196,9 @@ input[type="checkbox"] {
   border: 2px dashed #ccc;
 }
 
-
 .TodoIcons span.TodoIconsCompleted {
   background-color: #008000;
-  
 }
-
 
 .Todo:nth-child(6n + 1) {
   background: linear-gradient(
@@ -408,18 +405,13 @@ input[type="checkbox"] {
   border: none;
   cursor: pointer;
 }
-.SortingBtns button:nth-child(3){
-
-  width:250px;
+.SortingBtns button:nth-child(3) {
+  width: 250px;
   background: green;
   border: 5px dashed #ccc;
- 
 }
 
-.SortingBtns button:nth-child(3):hover{
-
-  
+.SortingBtns button:nth-child(3):hover {
   background: transparent;
   border: 5px dashed green;
- 
 }
