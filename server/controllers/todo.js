@@ -4,7 +4,7 @@ export const createTodo = async (req, res) => {
         const { title, createdAt } = req.body
         const user_id = req.user.userid._id
         if (!title) {
-            return res.status(200).json({
+            return res.status(500).json({
                 success: false,
                 message: 'Todo Should Not Be Empty'
             })
@@ -37,14 +37,14 @@ export const deleteTodo = async (req, res) => {
     try {
         const { todoid } = req.params
         if (!todoid) {
-            res.status(200).json({
+            res.status(500).json({
                 success: false,
                 message: "Invalid Todo ID"
             })
         }
         const deletedTodo = await Todo.findByIdAndDelete(todoid)
         if (!deletedTodo) {
-            res.status(200).json({
+            res.status(500).json({
                 success: false,
                 message: 'Todo Deletion Failed, Somthing Went Wrong'
             })
@@ -64,7 +64,7 @@ export const editTodo = async (req, res) => {
         const { todoid } = req.params
         const { title } = req.body
         if (!todoid) {
-            res.status(200).json({
+            res.status(500).json({
                 success: false,
                 message: "Invalid Todo ID"
             })
@@ -74,7 +74,7 @@ export const editTodo = async (req, res) => {
             title: title
         })
         if (!todo) {
-            res.status(200).json({
+            res.status(500).json({
                 success: false,
                 message: 'Todo Updation Failed'
             })
@@ -93,7 +93,7 @@ export const getTodos = async (req, res) => {
         const username = req.user.name
         const todos = await Todo.find({ user_id })
         if (!todos) {
-            res.status(200).json({
+            res.status(500).json({
                 success: false,
                 message: 'Todos Fetching Failed'
             })
@@ -141,7 +141,7 @@ export const createTask = async (req, res) => {
         const { todoid } = req.params
         const { task } = req.body
         if (!todoid) {
-            res.status(200).json({
+            res.status(500).json({
                 success: false,
                 message: "Can't Find Todo ID For This Task"
             })
@@ -167,7 +167,7 @@ export const deleteTask = async (req, res) => {
         // Find and update the todo tasks
         const todo = await Todo.findById(todoid);
         if (!todo) {
-            return res.status(200).json({
+            return res.status(500).json({
                 success: false,
                 message: "Todo Not Found, Invalid ID",
             });
@@ -268,6 +268,64 @@ export const editTask = async (req, res) =>{
 }
 
 // ================================
+export const completeTodo = async (req, res) => {
+    try {
+      const { todoid } = req.params;
+      const { completed } = req.body;
+  
+      if (!todoid) {
+        return res.status(400).json({
+          success: false,
+          message: "Invalid Todo ID",
+        });
+      }
+  
+      // Find and update the todo completion status
+      const todo = await Todo.findByIdAndUpdate(
+        todoid,
+        { completed },
+        { new: true }
+      );
+  
+      if (!todo) {
+        return res.status(404).json({
+          success: false,
+          message: "Todo Not Found, Invalid ID",
+        });
+      }
+  
+      res.status(200).json({
+        success: true,
+        message: "Todo Completion Status Updated Successfully",
+        todo,
+      });
+    } catch (error) {
+      return res.status(500).json({
+        success: false,
+        message: error.message || "Internal Server Error",
+      });
+    }
+  };
+  
+export const sortCompletedTodos = async (req, res) => {
+    try {
+        const user_id = req.user.userid._id;
+
+        // Fetch todos sorted based on completion status
+        const todos = await Todo.find({ user_id }).sort({ completed: -1 });
+
+        res.status(200).json({
+            success: true,
+            message: "Todos Sorted Successfully",
+            todos,
+        });
+    } catch (error) {
+        res.status(400).json({
+            error: error.message,
+        });
+    }
+};
+
 
 export const sortTodo = async (req, res) => {
     try {

@@ -15,7 +15,11 @@ const todoSchema = new Schema({
     },
     createdAt: {
         type: Number
-    }
+    } ,
+    completed: {
+        type: Boolean,
+        default: false,
+    },
 })
 
 export default mongoose.model('Todo', todoSchema)

@@ -2,9 +2,15 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Swal from "sweetalert2";
+import withReactContent from "sweetalert2-react-content";
 import "react-toastify/dist/ReactToastify.css";
 import "./landing.css";
 import TodoForm from "../../components/TodoForm";
+
+import "./landing.css";
+const MySwal = withReactContent(Swal);
+
 
 const Landing = () => {
   const [isFakeDark, setIsFakeDark] = useState(false);
@@ -374,17 +380,28 @@ const Landing = () => {
     const todoarray = await response.data.todos;
     settodos(todoarray);
   };
+
+
+
   useEffect(() => {
     loadTodos();
-     // Toggle the fake dark mode class on the root element
-     document.documentElement.classList.toggle("fake-dark-mode", isFakeDark);
+    // Toggle the fake dark mode class on the root element
+    document.documentElement.classList.toggle("fake-dark-mode", isFakeDark);
 
     setTodoAdded(false);
     setTodoDeleted(false);
     setTaskAdded(false);
     setTaskDeleted(false);
     setTodoEditted(false);
-  }, [showtask, todoAdded, todoDeleted, taskAdded, taskDeleted, todoEditted, isFakeDark]);
+  }, [
+    showtask,
+    todoAdded,
+    todoDeleted,
+    taskAdded,
+    taskDeleted,
+    todoEditted,
+    isFakeDark,
+  ]);
 
   const navigate = useNavigate();
   const logout = () => {
@@ -394,23 +411,63 @@ const Landing = () => {
     }, 1000);
   };
 
-  const [isChecked, setIsChecked] = useState(Array(todos.length).fill(false));
-  const handleCheckboxChange = (index) => {
-    // Create a copy of the isChecked array
-    const updatedIsChecked = [...isChecked];
-    // Toggle the isChecked value for the corresponding todo item
-    updatedIsChecked[index] = !updatedIsChecked[index];
-    // Update the state with the modified isChecked array
-    setIsChecked(updatedIsChecked);
-  };
+  const [isChecked, setIsChecked] = useState({});
+
+  const handleCheckboxChange = async (todoId) => {
+  const updatedIsChecked = { ...isChecked };
+  updatedIsChecked[todoId] = !updatedIsChecked[todoId];
+  setIsChecked(updatedIsChecked);
+
+  if (updatedIsChecked[todoId]) {
+    // Show SweetAlert for completing the todo
+    const result = await MySwal.fire({
+      title: "Mark as Completed?",
+      text: "Do you want to delete all tasks for this completed todo?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Yes, delete all tasks!",
+    });
+
+    if (result.isConfirmed) {
+      // Delete all tasks for the completed todo
+      await handleDelete(todoId);
+      // Update state to uncheck the completed todo
+      const updatedIsChecked = { ...isChecked };
+      updatedIsChecked[todoId] = false;
+      setIsChecked(updatedIsChecked);
+    }
+  }
+};
+
 
   const handleCloseTasksPopup = () => {
     setshowtask(false);
     setOpenTodoId(null);
   };
 
+
+
+
+
+  const sortCompletedTodos = async () => {
+    try {
+        const response = await axios.get("/todo/sortcompletedtodos", {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        });
+        const sortedTodos = response.data.todos;
+        settodos(sortedTodos);
+    } catch (error) {
+        // Handle error
+        console.error("Error sorting todos based on completion:", error);
+    }
+};
+
+
+
   return (
-    <div className={`TodoWrapper ${isFakeDark ? "fake-dark-mode": ""}`}>
+    <div className={`TodoWrapper ${isFakeDark ? "fake-dark-mode" : ""}`}>
       <button
         onClick={() => setIsFakeDark((isFakeDark) => !isFakeDark)}
         className="btn-fake-dark-mode"
@@ -434,13 +491,13 @@ const Landing = () => {
               <div className="Todo">
                 <label
                   htmlFor={`my-task-${index}`}
-                  className={isChecked[index] ? "completed" : ""}
+                  className={isChecked[todo._id] ? "completed" : ""}
                 >
                   <input
                     type="checkbox"
                     id={`my-task-${index}`}
-                    checked={isChecked[index]}
-                    onChange={() => handleCheckboxChange(index)}
+                    checked={isChecked[todo._id] || false}
+                    onChange={() => handleCheckboxChange(todo._id)}
                   />
 
                   <div>
@@ -457,9 +514,13 @@ const Landing = () => {
                 </label>
 
                 <div className="TodoIcons">
-                  <span onClick={() => handleTaskClick(todo._id)}>
-                    {" "}
-                    Tasks: {todo.tasks.length}{" "}
+                  <span
+                    onClick={() => handleTaskClick(todo._id)}
+                    className={isChecked[todo._id] ? "TodoIconsCompleted" : ""}
+                  >
+                    { !isChecked[todo._id]
+                      ? ` Tasks ${todo.tasks.length}`
+                      : "Completed"}
                   </span>
 
                   <i
@@ -503,14 +564,16 @@ const Landing = () => {
 
             <ul>
               {tasks.map((task, index) => (
-                <li className="Todo" key={index} >
+                <li className="Todo" key={index}>
                   <h3>{task}</h3>
                   <div className="TodoIcons">
-                    <i class="Icon ri-delete-bin-6-line"
-                    onClick={() => handleTaskDelete( index)}
+                    <i
+                      class="Icon ri-delete-bin-6-line"
+                      onClick={() => handleTaskDelete(index)}
                     ></i>
-                    <i className="Icon ri-edit-2-fill"
-                    onClick={() => handleEditTask(index)}
+                    <i
+                      className="Icon ri-edit-2-fill"
+                      onClick={() => handleEditTask(index)}
                     ></i>
                   </div>
                 </li>

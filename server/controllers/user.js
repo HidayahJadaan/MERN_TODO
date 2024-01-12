@@ -23,7 +23,7 @@ export const signup = async (req, res) => {
         })
         const response = await user.save()
         if (!response) {
-            return res.status(200).json({
+            return res.status(500).json({
                 success: false,
                 message: 'User Registeration Failed'
             })
@@ -44,7 +44,7 @@ export const login = async (req, res) => {
     try {
         const { email, password } = req.body
         if (!email || !password) {
-            return res.status(200).json({
+            return res.status(500).json({
                 success: false,
                 message: 'All Fields Are Required'
             })

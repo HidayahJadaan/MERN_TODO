@@ -11,7 +11,9 @@ import {
     deleteTask,
     getTasks,
     editTask,
-    sortTodo
+    sortTodo,
+    completeTodo,
+    sortCompletedTodos
 } from '../controllers/todo.js'
 
 import auth from '../middlewares/auth.js'
@@ -22,6 +24,9 @@ router.delete('/deletetodo/:todoid', deleteTodo)
 router.get('/gettodo/:todoid', getTodo)
 router.get('/gettodos', getTodos)
 router.put('/editTodo/:todoid', editTodo)
+router.put('/completetodo/:todoid', completeTodo);
+router.get('/sortcompletedtodos', sortCompletedTodos);
+
 router.post('/createtask/:todoid', createTask)
 router.delete('/deletetask/:todoid/:taskIndex', deleteTask);
 router.put('/edittask/:todoid', editTask)
