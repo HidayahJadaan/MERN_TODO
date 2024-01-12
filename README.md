@@ -24,4 +24,5 @@ A simple and easy-to-use todo app that helps you stay organized and on top of yo
 - Each user can save their own account
 - Create Todo and instatly renders on the screen
 - Todos are get saved in database
+- Dark Theme Property
 - All CRUD operations can be done.
