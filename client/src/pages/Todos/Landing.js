@@ -15,7 +15,7 @@ const MySwal = withReactContent(Swal);
 const Landing = () => {
   const [isFakeDark, setIsFakeDark] = useState(false);
   const [openTodoId, setOpenTodoId] = useState(null);
-
+const [toggleingCheckbox, setToggleingCheckbox] = useState(false)
   const [username, setUserName] = useState(null);
   // fetching user todos
   const [todos, settodos] = useState([]);
@@ -43,7 +43,15 @@ const Landing = () => {
       headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
     });
     const { todos, username } = await response.data;
+  
+    // Load completion status for each todo
+    const updatedIsChecked = {};
+    todos.forEach((todo) => {
+      updatedIsChecked[todo._id] = todo.completed || false;
+    });
+  
     setUserName(username);
+    setIsChecked(updatedIsChecked);
     settodos(todos);
   };
   const handleSubmit = async (e) => {
@@ -400,7 +408,7 @@ const Landing = () => {
     taskAdded,
     taskDeleted,
     todoEditted,
-    isFakeDark,
+    isFakeDark,toggleingCheckbox
   ]);
 
   const navigate = useNavigate();
@@ -414,32 +422,78 @@ const Landing = () => {
   const [isChecked, setIsChecked] = useState({});
 
   const handleCheckboxChange = async (todoId) => {
-  const updatedIsChecked = { ...isChecked };
-  updatedIsChecked[todoId] = !updatedIsChecked[todoId];
-  setIsChecked(updatedIsChecked);
-
-  if (updatedIsChecked[todoId]) {
-    // Show SweetAlert for completing the todo
-    const result = await MySwal.fire({
-      title: "Mark as Completed?",
-      text: "Do you want to delete all tasks for this completed todo?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete all tasks!",
-    });
-
-    if (result.isConfirmed) {
-      // Delete all tasks for the completed todo
-      await handleDelete(todoId);
-      // Update state to uncheck the completed todo
+    try {
       const updatedIsChecked = { ...isChecked };
-      updatedIsChecked[todoId] = false;
+      updatedIsChecked[todoId] = !updatedIsChecked[todoId];
+      setIsChecked(updatedIsChecked);
+ 
+      if (updatedIsChecked[todoId]) {
+        // Show SweetAlert for completing the todo
+        const result = await MySwal.fire({
+          title: "Mark as Completed?",
+          text: "Do you want to delete this todo, and all its tasks?, if you click cancel you only marked it as completed",
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete all tasks!",
+        });
+  
+        if (result.isConfirmed) {
+          // Update the completion status using the separate function
+          await updateTodoCompletion(todoId, updatedIsChecked[todoId]);
+          await handleDelete(todoId);
+          setToggleingCheckbox(!toggleingCheckbox)
+        } else {
+          // If "Cancel" is clicked, update the todo's completion status without deleting it
+          await updateTodoCompletion(todoId, updatedIsChecked[todoId]);
+          setToggleingCheckbox(!toggleingCheckbox)
+        }
+      } else {
+        // If the checkbox is unchecked (todo marked as incomplete), update the todo's completion status without showing the SweetAlert
+        await updateTodoCompletion(todoId, updatedIsChecked[todoId]);
+        setToggleingCheckbox(!toggleingCheckbox)
+      }
+    } catch (error) {
+      console.error("Error handling checkbox change:", error);
+    }
+  };
+  
+
+
+
+const updateTodoCompletion = async (todoId, completed) => {
+  try {
+    const response = await axios.put(
+      `/todo/completetodo/${todoId}`,
+      { completed },
+      {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
+        },
+      }
+    );
+
+    const responseData = response.data;
+
+    if (!responseData.success) {
+      // Handle the API call failure
+      console.error(responseData.message);
+      // Optionally, you can revert the isChecked state if the API call fails
+      const updatedIsChecked = { ...isChecked };
+      updatedIsChecked[todoId] = !completed;
       setIsChecked(updatedIsChecked);
     }
+  } catch (error) {
+    console.error("Error updating completion status:", error);
+    // Optionally, you can revert the isChecked state if an error occurs
+    const updatedIsChecked = { ...isChecked };
+    updatedIsChecked[todoId] = !completed;
+    setIsChecked(updatedIsChecked);
   }
 };
+
+
 
 
   const handleCloseTasksPopup = () => {
@@ -491,7 +545,7 @@ const Landing = () => {
               <div className="Todo">
                 <label
                   htmlFor={`my-task-${index}`}
-                  className={isChecked[todo._id] ? "completed" : ""}
+                  className={toggleingCheckbox && todo.completed ? "completed" : ""}
                 >
                   <input
                     type="checkbox"
@@ -516,9 +570,9 @@ const Landing = () => {
                 <div className="TodoIcons">
                   <span
                     onClick={() => handleTaskClick(todo._id)}
-                    className={isChecked[todo._id] ? "TodoIconsCompleted" : ""}
+                    className={todo.completed ? "TodoIconsCompleted" : ""}
                   >
-                    { !isChecked[todo._id]
+                    { !todo.completed
                       ? ` Tasks ${todo.tasks.length}`
                       : "Completed"}
                   </span>
