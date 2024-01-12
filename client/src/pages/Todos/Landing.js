@@ -108,33 +108,52 @@ const [toggleingCheckbox, setToggleingCheckbox] = useState(false)
   };
   const handleDelete = async (id) => {
     try {
-      const res = await axios.delete(`/todo/deletetodo/${id}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      // Show SweetAlert for completing the todo
+      const result = await MySwal.fire({
+        title: "Delete This Todo?",
+        text: "If You Click Yes This Todo Will Be Deleted Permanently",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#008000",
+        confirmButtonText: "Delete",
+        cancelButtonText: "Cancel", // This line was missing
       });
-      const response = await res.data;
-      if (response.success) {
-        setTodoDeleted(true);
-        toast.success(response.message, {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
+  
+      if (result.isConfirmed) {
+        // User clicked "Yes," delete the todo
+        const deleteResult = await axios.delete(`/todo/deletetodo/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         });
+  
+        if (deleteResult.data.success) {
+          setTodoDeleted(true);
+          toast.success(deleteResult.data.message, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        } else {
+          toast.error(deleteResult.data.message, {
+            position: "top-right",
+            autoClose: 5000,
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            theme: "light",
+          });
+        }
       } else {
-        toast.error(response.message, {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-        });
+        // User clicked "Cancel," do nothing
       }
     } catch (error) {
       toast.error(error.message, {
@@ -149,6 +168,7 @@ const [toggleingCheckbox, setToggleingCheckbox] = useState(false)
       });
     }
   };
+  
   const handleEdit = async (id) => {
     try {
       const newtodo = window.prompt("Enter new Todo");
@@ -426,41 +446,41 @@ const [toggleingCheckbox, setToggleingCheckbox] = useState(false)
       const updatedIsChecked = { ...isChecked };
       updatedIsChecked[todoId] = !updatedIsChecked[todoId];
       setIsChecked(updatedIsChecked);
- 
+  
       if (updatedIsChecked[todoId]) {
         // Show SweetAlert for completing the todo
         const result = await MySwal.fire({
           title: "Mark as Completed?",
-          text: "Do you want to delete this todo, and all its tasks?, if you click cancel you only marked it as completed",
+          text: "Do you want to delete this todo, and all its tasks? If you click cancel, you only mark it as completed.",
           icon: "question",
           showCancelButton: true,
-          confirmButtonColor: "#3085d6",
-          cancelButtonColor: "#d33",
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#008000",
           confirmButtonText: "Yes, delete all tasks!",
+          cancelButtonText: "Mark As Completed Only",
         });
   
         if (result.isConfirmed) {
           // Update the completion status using the separate function
           await updateTodoCompletion(todoId, updatedIsChecked[todoId]);
+          // Call handleDelete only if the user confirms
           await handleDelete(todoId);
-          setToggleingCheckbox(!toggleingCheckbox)
         } else {
           // If "Cancel" is clicked, update the todo's completion status without deleting it
           await updateTodoCompletion(todoId, updatedIsChecked[todoId]);
-          setToggleingCheckbox(!toggleingCheckbox)
         }
       } else {
         // If the checkbox is unchecked (todo marked as incomplete), update the todo's completion status without showing the SweetAlert
         await updateTodoCompletion(todoId, updatedIsChecked[todoId]);
-        setToggleingCheckbox(!toggleingCheckbox)
       }
+  
+      setToggleingCheckbox(!toggleingCheckbox);
     } catch (error) {
       console.error("Error handling checkbox change:", error);
     }
   };
   
-
-
+  
 
 const updateTodoCompletion = async (todoId, completed) => {
   try {
@@ -507,18 +527,36 @@ const updateTodoCompletion = async (todoId, completed) => {
 
   const sortCompletedTodos = async () => {
     try {
-        const response = await axios.get("/todo/sortcompletedtodos", {
-            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        });
-        const sortedTodos = response.data.todos;
-        settodos(sortedTodos);
+      const response = await axios.get("/todo/sortcompletedtodos", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      const sortedTodos = response.data.todos;
+      settodos(sortedTodos);
     } catch (error) {
-        // Handle error
-        console.error("Error sorting todos based on completion:", error);
+      // Handle error
+      console.error("Error sorting todos based on completion:", error);
     }
-};
+  };
 
-
+  const handleDeleteConfirmation = (id) => {
+    // Show the delete confirmation dialog and call handleDelete if confirmed
+    MySwal.fire({
+      title: "Delete Confirmation",
+      text: "Are you sure you want to delete this todo?",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#008000",
+      confirmButtonText: "Yes, delete it!",
+      cancelButtonText: "Cancel",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        // User confirmed, call handleDelete
+        handleDelete(id);
+      }
+    });
+  };
+  
 
   return (
     <div className={`TodoWrapper ${isFakeDark ? "fake-dark-mode" : ""}`}>
@@ -531,6 +569,7 @@ const updateTodoCompletion = async (todoId, completed) => {
       <div className="SortingBtns">
         <button onClick={() => sort(1)}>Oldest</button>
         <button onClick={() => sort(-1)}>Newest</button>
+        <button onClick={sortCompletedTodos}>Completed First</button>
       </div>
       <button className="navBtn" onClick={() => logout()}>
         <i class="ri-shut-down-line"></i>{" "}
@@ -545,7 +584,7 @@ const updateTodoCompletion = async (todoId, completed) => {
               <div className="Todo">
                 <label
                   htmlFor={`my-task-${index}`}
-                  className={toggleingCheckbox && todo.completed ? "completed" : ""}
+                  className={todo.completed ? "completed" : ""}
                 >
                   <input
                     type="checkbox"
@@ -578,7 +617,7 @@ const updateTodoCompletion = async (todoId, completed) => {
                   </span>
 
                   <i
-                    onClick={() => handleDelete(todo._id)}
+                    onClick={() => handleDeleteConfirmation(todo._id)}
                     class="Icon ri-delete-bin-6-line"
                   ></i>
                   <i
@@ -590,7 +629,7 @@ const updateTodoCompletion = async (todoId, completed) => {
             ))}
         </div>
         {todos.length > 0 ? (
-          <p>Remaining Tasks: {todos.length} 🔥</p>
+          <h1>🔥 Completd Todos: {todos.filter(todo => todo.completed).length} 🔥</h1>
         ) : (
           <h4>Add Your First Todo 🔥</h4>
         )}

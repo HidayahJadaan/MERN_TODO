@@ -198,7 +198,7 @@ input[type="checkbox"] {
 
 
 .TodoIcons span.TodoIconsCompleted {
-  background-color: green;
+  background-color: #008000;
   
 }
 
@@ -407,4 +407,19 @@ input[type="checkbox"] {
   background-color: #ffe8cc;
   border: none;
   cursor: pointer;
+}
+.SortingBtns button:nth-child(3){
+
+  width:250px;
+  background: green;
+  border: 5px dashed #ccc;
+ 
+}
+
+.SortingBtns button:nth-child(3):hover{
+
+  
+  background: transparent;
+  border: 5px dashed green;
+ 
 }
